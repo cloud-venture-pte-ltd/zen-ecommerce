@@ -1,0 +1,21 @@
+name: Linting
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Python Linting
+      - name: Lint Python
+        run: |
+          pip install ruff
+          ruff check src/backend/
+      
+      # JavaScript Linting
+      - name: Lint JavaScript
+        run: |
+          cd src/frontend
+          npm install
+          npx eslint .

@@ -5,19 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      PORT: 3000
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: zeneshop_db
-      DB_USER: ecom_user
-      DB_PASSWORD: ecom_pass
-      SESSION_SECRET: supersecretkey
-      ADMIN_EMAIL: admin@example.com
-      ADMIN_PASSWORD: Admin@123
-      PAYMENT_PROVIDER: mock
-      PAYMENT_PUBLIC_KEY: pk_test_demo_only
-      PAYMENT_SECRET_KEY: sk_test_demo_only
+    env_file:
+      - .env
     volumes:
       - ./public/uploads:/app/public/uploads
     depends_on:
@@ -29,10 +18,10 @@ services:
     container_name: zen-eshop-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: zeneshop_db
-      MYSQL_USER: ecom_user
-      MYSQL_PASSWORD: ecom_pass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
     volumes:

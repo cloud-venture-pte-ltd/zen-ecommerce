@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<div class="row g-4 align-items-start">
+  <div class="col-md-6">
+    <img class="img-fluid rounded shadow-sm product-detail-img" src="<%= product.image_url || 'https://via.placeholder.com/900x600?text=Product' %>" alt="<%= product.name %>">
+  </div>
+  <div class="col-md-6">
+    <span class="badge text-bg-light mb-2"><%= product.category %></span>
+    <h1 class="h2"><%= product.name %></h1>
+    <p class="text-muted"><%= product.description %></p>
+    <p class="fs-4 fw-bold">$<%= Number(product.price).toFixed(2) %></p>
+    <p>Stock: <strong><%= product.stock %></strong></p>
+    <form action="/cart/add/<%= product.id %>" method="POST" class="row g-2">
+      <div class="col-auto">
+        <input type="number" name="quantity" class="form-control" value="1" min="1" max="<%= product.stock || 1 %>">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary" <%= product.stock <= 0 ? 'disabled' : '' %>>Add to Cart</button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+<div class="card shadow-sm">
+  <div class="card-body p-5 text-center">
+    <h1 class="display-6">Order Confirmed</h1>
+    <p class="lead">Your POC order #<strong><%= orderId %></strong> was created successfully.</p>
+    <p>Total paid: <strong>$<%= Number(total).toFixed(2) %></strong></p>
+    <p>Payment provider: <strong><%= paymentProvider %></strong></p>
+    <p>Reference: <code><%= paymentReference %></code></p>
+    <a href="/" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</div>
+<%- include('partials/footer') %>

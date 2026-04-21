@@ -1,0 +1,49 @@
+services:
+  web:
+    build: .
+    container_name: zen-eshop
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ecommerce_db
+      DB_USER: ecom_user
+      DB_PASSWORD: ecom_pass
+      SESSION_SECRET: supersecretkey
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: Admin@123
+      PAYMENT_PROVIDER: mock
+      PAYMENT_PUBLIC_KEY: pk_test_demo_only
+      PAYMENT_SECRET_KEY: sk_test_demo_only
+    volumes:
+      - ./public/uploads:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: ecommerce-mysql-v3
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_USER: ecom_user
+      MYSQL_PASSWORD: ecom_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  mysql_data:

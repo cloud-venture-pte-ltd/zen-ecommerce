@@ -1,0 +1,52 @@
+<%- include('partials/header') %>
+<div class="row g-4">
+  <div class="col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h1 class="h3 mb-1">Checkout</h1>
+            <p class="text-muted mb-0">POC payment provider: <strong><%= paymentProvider %></strong></p>
+          </div>
+          <span class="badge text-bg-warning">Demo Mode</span>
+        </div>
+        <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+        <form action="/checkout" method="POST" class="d-grid gap-3">
+          <h2 class="h5 mt-2 mb-0">Shipping Details</h2>
+          <input class="form-control" type="text" name="customer_name" value="<%= currentUser ? currentUser.name : '' %>" placeholder="Full name" required>
+          <input class="form-control" type="email" name="customer_email" value="<%= currentUser ? currentUser.email : '' %>" placeholder="Email" required>
+          <textarea class="form-control" name="shipping_address" rows="4" placeholder="Shipping address" required></textarea>
+
+          <h2 class="h5 mt-2 mb-0">Payment Details</h2>
+          <div class="alert alert-secondary mb-0">Use any demo card number with at least 12 digits. No real payment is processed in this POC.</div>
+          <input class="form-control" type="text" name="card_name" placeholder="Name on card" required>
+          <input class="form-control" type="text" name="card_number" placeholder="Card number" required>
+          <div class="row g-3">
+            <div class="col-md-6"><input class="form-control" type="text" name="expiry" placeholder="MM/YY" required></div>
+            <div class="col-md-6"><input class="form-control" type="text" name="cvv" placeholder="CVV" required></div>
+          </div>
+          <button class="btn btn-success">Pay $<%= total.toFixed(2) %></button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="h5 mb-3">Order Summary</h2>
+        <% cartItems.forEach(item => { %>
+          <div class="d-flex justify-content-between mb-2">
+            <span><%= item.name %> × <%= item.quantity %></span>
+            <span>$<%= item.subtotal.toFixed(2) %></span>
+          </div>
+        <% }) %>
+        <hr>
+        <div class="d-flex justify-content-between fw-bold">
+          <span>Total</span>
+          <span>$<%= total.toFixed(2) %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') %>

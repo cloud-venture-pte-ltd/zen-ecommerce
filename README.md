@@ -53,7 +53,7 @@ docker compose up -d --build
 
 ```text
 Email: admin@example.com
-Password: Admin@123
+Password: 
 ```
 
 ## Demo payment

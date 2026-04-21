@@ -9,7 +9,7 @@ services:
       PORT: 3000
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: ecommerce_db
+      DB_NAME: zeneshop_db
       DB_USER: ecom_user
       DB_PASSWORD: ecom_pass
       SESSION_SECRET: supersecretkey
@@ -26,11 +26,11 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: ecommerce-mysql-v3
+    container_name: zen-eshop-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: ecommerce_db
+      MYSQL_DATABASE: zeneshop_db
       MYSQL_USER: ecom_user
       MYSQL_PASSWORD: ecom_pass
     ports:

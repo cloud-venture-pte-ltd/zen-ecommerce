@@ -82,7 +82,7 @@ and mounted into the container so they stay available between restarts.
 ```text
 Host: 127.0.0.1
 Port: 3307
-Database: ecommerce_db
+Database: zeneshop_db
 User: ecom_user
 Password: ecom_pass
 ```

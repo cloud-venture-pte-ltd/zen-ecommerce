@@ -1,0 +1,300 @@
+{% include 'partials/header.html' %}
+
+<style>
+  .admin-stat-card {
+    border: 0;
+    border-radius: 14px;
+  }
+  .admin-section-card {
+    border: 0;
+    border-radius: 14px;
+  }
+  .admin-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+  }
+  .admin-product-row + .admin-product-row {
+    border-top: 1px solid #eee;
+  }
+  .admin-actions {
+    min-width: 180px;
+  }
+  .admin-details summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  .admin-details summary::-webkit-details-marker {
+    display: none;
+  }
+  .admin-details[open] summary {
+    margin-bottom: 12px;
+  }
+  .admin-badge {
+    font-size: 0.75rem;
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-1">Admin Dashboard</h1>
+    <p class="text-muted mb-0">Manage products and monitor recent orders.</p>
+  </div>
+  <a href="{{ path_with_base('/') }}" class="btn btn-outline-secondary">Back to Store</a>
+</div>
+
+{% set product_count = products|length %}
+{% set order_count = orders|length %}
+{% set low_stock_count = products | selectattr('stock', 'lt', 5) | list | length %}
+
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm admin-stat-card">
+      <div class="card-body">
+        <div class="text-muted small">Products</div>
+        <div class="fs-3 fw-bold">{{ product_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm admin-stat-card">
+      <div class="card-body">
+        <div class="text-muted small">Recent Orders</div>
+        <div class="fs-3 fw-bold">{{ order_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm admin-stat-card">
+      <div class="card-body">
+        <div class="text-muted small">Low Stock Items</div>
+        <div class="fs-3 fw-bold">{{ low_stock_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-5">
+    <div class="card shadow-sm admin-section-card h-100">
+      <div class="card-body p-4">
+        <h2 class="h5 mb-3">Add Product</h2>
+
+        {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        {% if success %}
+          <div class="alert alert-success">{{ success }}</div>
+        {% endif %}
+
+        <form action="{{ path_with_base('/admin/products') }}" method="POST" enctype="multipart/form-data" class="d-grid gap-3">
+          <div>
+            <label class="form-label">Product Name</label>
+            <input class="form-control" name="name" placeholder="Product name" required>
+          </div>
+
+          <div>
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="4" placeholder="Description" required></textarea>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Category</label>
+              <input class="form-control" name="category" value="General" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Stock</label>
+              <input class="form-control" name="stock" type="number" min="0" placeholder="0" required>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Price</label>
+            <input class="form-control" name="price" type="number" step="0.01" placeholder="0.00" required>
+          </div>
+
+          <div>
+            <label class="form-label">Upload Product Image</label>
+            <input class="form-control" name="image_file" type="file" accept="image/*">
+          </div>
+
+          <div class="text-center text-muted small">or</div>
+
+          <div>
+            <label class="form-label">Image URL</label>
+            <input class="form-control" name="image_url" placeholder="https://example.com/image.jpg">
+          </div>
+
+          <button class="btn btn-primary" type="submit">Save Product</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card shadow-sm admin-section-card h-100">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">Recent Orders</h2>
+          <span class="text-muted small">Latest {{ order_count }}</span>
+        </div>
+
+        {% if orders %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                  <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>
+                      <div class="fw-semibold">{{ order.customer_name }}</div>
+                      <div class="small text-muted">{{ order.customer_email }}</div>
+                    </td>
+                    <td>${{ '%.2f'|format(order.total_amount) }}</td>
+                    <td>
+                      <span class="badge text-bg-success admin-badge">{{ order.status }}</span>
+                    </td>
+                    <td class="text-end">
+                      <a href="{{ path_with_base('/orders/' ~ order.id) }}" class="btn btn-sm btn-outline-secondary mb-2">View</a>
+
+                      <form method="POST" action="{{ path_with_base('/admin/orders/' ~ order.id ~ '/status') }}" class="d-flex gap-2 justify-content-end">
+                        <select class="form-select form-select-sm" name="status" style="max-width: 140px;">
+                          <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                          <option value="Paid" {% if order.status == 'Paid' or order.status == 'Paid (Mock Gateway)' %}selected{% endif %}>Paid</option>
+                          <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                          <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                          <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-light border mb-0">No recent orders found.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm admin-section-card">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">Product Catalog</h2>
+      <span class="text-muted small">{{ product_count }} items</span>
+    </div>
+
+    {% if products %}
+      <div class="d-flex flex-column">
+        {% for product in products %}
+          <div class="admin-product-row py-3">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-1 col-3">
+                <img
+                  class="admin-thumb"
+                  src="{{ product.image_url or 'https://via.placeholder.com/150' }}"
+                  alt="{{ product.name }}"
+                >
+              </div>
+
+              <div class="col-md-5 col-9">
+                <div class="fw-semibold">{{ product.name }}</div>
+                <div class="small text-muted mb-1">{{ product.category }}</div>
+                <div class="small text-muted">
+                  {{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-2 col-4">
+                <div class="small text-muted">Price</div>
+                <div class="fw-semibold">${{ '%.2f'|format(product.price) }}</div>
+              </div>
+
+              <div class="col-md-2 col-4">
+                <div class="small text-muted">Stock</div>
+                {% if product.stock < 5 %}
+                  <div><span class="badge text-bg-warning">{{ product.stock }}</span></div>
+                {% else %}
+                  <div class="fw-semibold">{{ product.stock }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-2 col-4 text-md-end">
+                <form action="{{ path_with_base('/admin/products/' ~ product.id ~ '/delete') }}" method="POST" onsubmit="return confirm('Delete this product?');" class="mb-2">
+                  <button class="btn btn-sm btn-outline-danger w-100" type="submit">Delete</button>
+                </form>
+              </div>
+            </div>
+
+            <details class="admin-details mt-3">
+              <summary class="btn btn-sm btn-outline-primary">Edit Product</summary>
+
+              <form action="{{ path_with_base('/admin/products/' ~ product.id ~ '/update') }}" method="POST" enctype="multipart/form-data" class="row g-3 mt-1">
+                <div class="col-md-6">
+                  <label class="form-label">Product Name</label>
+                  <input class="form-control" name="name" value="{{ product.name }}" required>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Category</label>
+                  <input class="form-control" name="category" value="{{ product.category }}" required>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Stock</label>
+                  <input class="form-control" name="stock" type="number" min="0" value="{{ product.stock }}" required>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Price</label>
+                  <input class="form-control" name="price" type="number" step="0.01" value="{{ '%.2f'|format(product.price) }}" required>
+                </div>
+
+                <div class="col-md-8">
+                  <label class="form-label">Image URL</label>
+                  <input class="form-control" name="image_url" value="{{ product.image_url or '' }}" placeholder="Image URL">
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control" name="description" rows="4" required>{{ product.description }}</textarea>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Replace Image</label>
+                  <input class="form-control" name="image_file" type="file" accept="image/*">
+                </div>
+
+                <div class="col-md-6 d-flex align-items-end">
+                  <button class="btn btn-primary w-100" type="submit">Save Changes</button>
+                </div>
+              </form>
+            </details>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-light border mb-0">No products found.</div>
+    {% endif %}
+  </div>
+</div>
+
+{% include 'partials/footer.html' %}

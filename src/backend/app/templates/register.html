@@ -1,0 +1,19 @@
+{% include 'partials/header.html' %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h3 mb-4">Register</h1>
+        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+        <form method="POST" action="{{ path_with_base('/register') }}">
+          <div class="mb-3"><label class="form-label">Name</label><input class="form-control" type="text" name="name" required></div>
+          <div class="mb-3"><label class="form-label">Email</label><input class="form-control" type="email" name="email" required></div>
+          <div class="mb-3"><label class="form-label">Password</label><input class="form-control" type="password" name="password" required></div>
+          <button class="btn btn-primary w-100" type="submit">Create Account</button>
+        </form>
+        <p class="mt-3 mb-0">Already have an account? <a href="{{ path_with_base('/login') }}">Login here</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'partials/footer.html' %}

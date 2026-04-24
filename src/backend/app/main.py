@@ -372,6 +372,10 @@ def seed_admin(request: Request, db: Session = Depends(get_db)):
     seed_admin_if_missing(db)
     return RedirectResponse(url=path_with_base("/login"), status_code=303)
 
+def generate_mock_reference():
+    return f"MOCKPAY-{int(time.time())}-{int(time.time() * 1000) % 100000}"
+
+
 
 @app.post(path_with_base("/checkout"), response_class=HTMLResponse)
 def checkout_post(
@@ -520,6 +524,7 @@ def order_history(request: Request, db: Session = Depends(get_db)):
         .order_by(Order.id.desc())
         .all()
     )
+    return render(request, "orders.html", {"orders": orders})
 
 
 @app.get(path_with_base("/admin"), response_class=HTMLResponse)

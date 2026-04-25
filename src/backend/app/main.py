@@ -194,11 +194,6 @@ def on_startup():
         raise RuntimeError(f"Unable to connect to PostgreSQL: {last_error}")
 
 
-@app.get("/", include_in_schema=False)
-def root_redirect():
-    return RedirectResponse(url=path_with_base("/"), status_code=302)
-
-
 @app.get(path_with_base("/"), response_class=HTMLResponse)
 def home(request: Request, q: str = "", db: Session = Depends(get_db)):
     if q:

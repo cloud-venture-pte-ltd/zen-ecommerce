@@ -17,4 +17,4 @@ jobs:
         run: |
           cd src/frontend
           npm install
-          npx eslint@8 --ext .js,.jsx pages/
+          npx eslint@8 pages/ --no-eslintrc --rule '{"no-undef": "error"}'

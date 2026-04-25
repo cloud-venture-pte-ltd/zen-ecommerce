@@ -16,12 +16,6 @@ build/
 *.pem
 *.key
 
-# --- Terraform ---
-.terraform/
-*.tfstate
-*.tfstate.backup
-.terraform.lock.hcl
-
 # --- OS / IDE ---
 .DS_Store
 Thumbs.db
@@ -30,3 +24,7 @@ Thumbs.db
 
 # --- Logs ---
 *.log
+terraform/environments/*.tfvars
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup

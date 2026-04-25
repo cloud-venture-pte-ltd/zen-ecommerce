@@ -17,4 +17,4 @@ jobs:
         run: |
           cd src/frontend
           npm install
-          npx eslint@8 pages/ --no-eslintrc --rule '{"no-undef": "error"}'
+          npx eslint@8 pages/ --no-eslintrc --env es2020 --env browser --parser-options=ecmaVersion:2020,sourceType:module

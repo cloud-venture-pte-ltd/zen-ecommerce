@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ app_name }}</title>
+  <link rel="icon" href="{{ (base_path or '') }}/static/favicon.ico">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .product-card img { height: 220px; object-fit: cover; }
+    .small-img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; border: 1px solid #dee2e6; }
+    .price { color: #198754; font-weight: 700; }
+    .logout-form { margin: 0; }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ path_with_base('/') }}">{{ app_name }}</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMain">
+      <form class="d-flex ms-lg-3 my-3 my-lg-0" method="GET" action="{{ path_with_base('/') }}">
+        <input class="form-control me-2" type="search" name="q" placeholder="Search products">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
+
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ path_with_base('/cart') }}">Cart ({{ cart_count or 0 }})</a>
+        </li>
+
+        {% if current_user %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ path_with_base('/orders') }}">My Orders</a>
+          </li>
+
+          {% if current_user.role == 'admin' %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ path_with_base('/admin') }}">Admin</a>
+            </li>
+          {% endif %}
+
+          <li class="nav-item">
+            <span class="nav-link">Hi, {{ current_user.name }}</span>
+          </li>
+
+          <li class="nav-item ms-lg-2">
+            <form method="POST" action="{{ path_with_base('/logout') }}" class="logout-form">
+              <button class="btn btn-sm btn-warning" type="submit">Logout</button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ path_with_base('/login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ path_with_base('/register') }}">Register</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">

@@ -1,0 +1,40 @@
+{% include 'partials/header.html' %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h3 mb-4">Checkout</h1>
+        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+        <form method="POST" action="{{ path_with_base('/checkout') }}">
+          <h5 class="mb-3">Shipping Details</h5>
+          <div class="mb-3"><label class="form-label">Customer Name</label><input class="form-control" type="text" name="customer_name" required></div>
+          <div class="mb-3"><label class="form-label">Customer Email</label><input class="form-control" type="email" name="customer_email" required></div>
+          <div class="mb-4"><label class="form-label">Shipping Address</label><textarea class="form-control" name="shipping_address" rows="4" required></textarea></div>
+          <h5 class="mb-3">Payment ({{ payment_provider }})</h5>
+          <div class="mb-3"><label class="form-label">Cardholder Name</label><input class="form-control" type="text" name="card_name" required></div>
+          <div class="mb-3"><label class="form-label">Card Number</label><input class="form-control" type="text" name="card_number" placeholder="4111 1111 1111 1111" required></div>
+          <div class="row">
+            <div class="col-md-6 mb-3"><label class="form-label">Expiry</label><input class="form-control" type="text" name="expiry" placeholder="12/29" required></div>
+            <div class="col-md-6 mb-3"><label class="form-label">CVV</label><input class="form-control" type="text" name="cvv" placeholder="123" required></div>
+          </div>
+          <button class="btn btn-success w-100 mt-2" type="submit">Place Order</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="mb-3">Order Summary</h4>
+        {% for item in cart_items %}
+          <div class="d-flex justify-content-between border-bottom py-2">
+            <div><strong>{{ item.name }}</strong><br><small class="text-muted">Qty: {{ item.quantity }}</small></div>
+            <div>${{ '%.2f'|format(item.subtotal) }}</div>
+          </div>
+        {% endfor %}
+        <div class="d-flex justify-content-between mt-3"><strong>Total</strong><strong>${{ '%.2f'|format(total) }}</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'partials/footer.html' %}

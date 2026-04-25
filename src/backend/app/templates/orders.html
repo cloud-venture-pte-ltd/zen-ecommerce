@@ -1,0 +1,35 @@
+{% include 'partials/header.html' %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">Order History</h1>
+  <a href="{{ path_with_base('/') }}" class="btn btn-outline-secondary">Back to Store</a>
+</div>
+
+{% if orders %}
+  {% for order in orders %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h2 class="h5 mb-1">Order #{{ order.id }}</h2>
+            <div class="text-muted small">
+              Payment: {{ order.payment_method or '-' }}
+              {% if order.payment_reference %}
+                | Ref: {{ order.payment_reference }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="text-end">
+            <div class="badge text-bg-success">{{ order.status }}</div>
+            <div class="fw-bold mt-2">${{ '%.2f'|format(order.total_amount) }}</div>
+            <a href="{{ path_with_base('/orders/' ~ order.id) }}" class="btn btn-sm btn-outline-primary mt-2">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info">You have no orders yet.</div>
+{% endif %}
+
+{% include 'partials/footer.html' %}

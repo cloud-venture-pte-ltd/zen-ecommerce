@@ -522,6 +522,23 @@ def order_history(request: Request, db: Session = Depends(get_db)):
     return render(request, "orders.html", {"orders": orders})
 
 
+@app.get(path_with_base("/orders/{order_id}"), response_class=HTMLResponse)
+def order_detail_page(order_id: int, request: Request, db: Session = Depends(get_db)):
+    user = current_user(request)
+    if not user:
+        return RedirectResponse(url=path_with_base("/login"), status_code=303)
+
+    order = (
+        db.query(Order)
+        .options(joinedload(Order.items).joinedload(OrderItem.product))
+        .filter(Order.id == order_id, Order.customer_email == user["email"])
+        .first()
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return render(request, "order_detail.html", {"order": order})
+
+
 @app.get(path_with_base("/admin"), response_class=HTMLResponse)
 def admin_get(request: Request, db: Session = Depends(get_db)):
     require_admin(request)
@@ -692,3 +709,361 @@ def admin_delete_product(product_id: int, request: Request, db: Session = Depend
         "admin.html",
         {"products": products, "orders": orders, "error": None, "success": "Product deleted successfully."},
     )
+
+
+# API Endpoints for Frontend
+from fastapi.responses import JSONResponse
+
+@app.get(path_with_base("/api/orders/{order_id}"))
+def api_get_order(order_id: int, request: Request, db: Session = Depends(get_db)):
+    user = current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    order = (
+        db.query(Order)
+        .options(joinedload(Order.items).joinedload(OrderItem.product))
+        .filter(Order.id == order_id, Order.customer_email == user["email"])
+        .first()
+    )
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return {
+        "id": order.id,
+        "customer_name": order.customer_name,
+        "customer_email": order.customer_email,
+        "shipping_address": order.shipping_address,
+        "total_amount": float(order.total_amount),
+        "status": order.status,
+        "payment_method": order.payment_method,
+        "payment_reference": order.payment_reference,
+        "items": [
+            {
+                "id": item.id,
+                "product": {"name": item.product.name},
+                "quantity": item.quantity,
+                "unit_price": float(item.unit_price),
+            }
+            for item in order.items
+        ],
+    }
+
+
+@app.get(path_with_base("/api/orders"))
+def api_get_orders(request: Request, db: Session = Depends(get_db)):
+    user = current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    orders = (
+        db.query(Order)
+        .filter(Order.customer_email == user["email"])
+        .order_by(Order.id.desc())
+        .all()
+    )
+    
+    return [
+        {
+            "id": order.id,
+            "customer_name": order.customer_name,
+            "total_amount": float(order.total_amount),
+            "status": order.status,
+            "created_at": order.created_at.isoformat() if hasattr(order, 'created_at') else None,
+        }
+        for order in orders
+    ]
+
+
+@app.get(path_with_base("/api/products"))
+def api_get_products(q: str = "", db: Session = Depends(get_db)):
+    if q:
+        products = (
+            db.query(Product)
+            .filter(
+                or_(
+                    Product.name.ilike(f"%{q}%"),
+                    Product.description.ilike(f"%{q}%"),
+                    Product.category.ilike(f"%{q}%"),
+                )
+            )
+            .order_by(Product.id.asc())
+            .all()
+        )
+    else:
+        products = db.query(Product).order_by(Product.id.asc()).all()
+    
+    return [
+        {
+            "id": p.id,
+            "name": p.name,
+            "description": p.description,
+            "price": float(p.price),
+            "image_url": p.image_url,
+            "stock": p.stock,
+            "category": p.category,
+        }
+        for p in products
+    ]
+
+
+@app.get(path_with_base("/api/products/{product_id}"))
+def api_get_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.get(Product, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    return {
+        "id": product.id,
+        "name": product.name,
+        "description": product.description,
+        "price": float(product.price),
+        "image_url": product.image_url,
+        "stock": product.stock,
+        "category": product.category,
+    }
+
+
+@app.post(path_with_base("/api/register"))
+def api_register(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    existing = db.query(User).filter(User.email == email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    user = User(
+        name=name,
+        email=email,
+        password_hash=hash_password(password),
+        role="customer"
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    return {
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+        },
+        "token": "mock-jwt-token-" + str(user.id),
+    }
+
+
+@app.post(path_with_base("/api/login"))
+def api_login(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not verify_password(password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    return {
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+        },
+        "token": "mock-jwt-token-" + str(user.id),
+    }
+
+
+@app.post(path_with_base("/api/admin/seed-admin"))
+def api_seed_admin(request: Request, db: Session = Depends(get_db)):
+    """Seed admin user via API."""
+    seed_admin_if_missing(db)
+    return {"message": "Admin user seeded successfully"}
+
+
+# Admin API endpoints
+@app.get(path_with_base("/api/admin/products"))
+def api_admin_products(request: Request, db: Session = Depends(get_db)):
+    """Get all products for admin."""
+    products = db.query(Product).order_by(Product.created_at.desc()).all()
+    return products
+
+
+@app.get(path_with_base("/api/admin/orders"))
+def api_admin_orders(request: Request, db: Session = Depends(get_db)):
+    """Get all orders for admin."""
+    orders = db.query(Order).order_by(Order.created_at.desc()).all()
+    return orders
+
+
+@app.post(path_with_base("/api/admin/products"))
+def api_admin_create_product(
+    request: Request,
+    name: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    stock: int = Form(...),
+    category: str = Form(...),
+    image_url: str = Form(None),
+    db: Session = Depends(get_db),
+):
+    """Create a new product (admin only)."""
+    product = Product(
+        name=name,
+        description=description,
+        price=price,
+        stock=stock,
+        category=category,
+        image_url=image_url if image_url else None,
+    )
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+@app.post(path_with_base("/api/admin/products/{product_id}/update"))
+def api_admin_update_product(
+    request: Request,
+    product_id: int,
+    name: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    stock: int = Form(...),
+    category: str = Form(...),
+    image_url: str = Form(None),
+    db: Session = Depends(get_db),
+):
+    """Update a product (admin only)."""
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    product.name = name
+    product.description = description
+    product.price = price
+    product.stock = stock
+    product.category = category
+    if image_url is not None:
+        product.image_url = image_url if image_url else None
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+@app.post(path_with_base("/api/admin/products/{product_id}/delete"))
+def api_admin_delete_product(
+    request: Request,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    """Delete a product (admin only)."""
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    db.delete(product)
+    db.commit()
+    return {"message": "Product deleted successfully"}
+
+
+@app.post(path_with_base("/api/admin/orders/{order_id}/status"))
+def api_admin_update_order_status(
+    request: Request,
+    order_id: int,
+    status: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    """Update order status (admin only)."""
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    order.status = status
+    db.commit()
+    db.refresh(order)
+    return order
+
+
+# Checkout API endpoint
+@app.post(path_with_base("/api/checkout"))
+def api_checkout(
+    request: Request,
+    customer_name: str = Form(...),
+    customer_email: str = Form(...),
+    shipping_address: str = Form(...),
+    payment_method: str = Form(...),
+    cart_items_json: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    """Process checkout and create order."""
+    import json
+    import random
+    
+    try:
+        cart_items = json.loads(cart_items_json)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid cart items format")
+    
+    if not cart_items:
+        raise HTTPException(status_code=400, detail="Cart is empty")
+    
+    # Calculate total and validate stock
+    total_amount = 0
+    order_items_data = []
+    
+    for item in cart_items:
+        product = db.query(Product).filter(Product.id == item['id']).first()
+        if not product:
+            raise HTTPException(status_code=404, detail=f"Product {item['id']} not found")
+        if product.stock < item['quantity']:
+            raise HTTPException(status_code=400, detail=f"Insufficient stock for {product.name}")
+        
+        total_amount += float(product.price) * item['quantity']
+        order_items_data.append({
+            'product': product,
+            'quantity': item['quantity'],
+            'unit_price': float(product.price)
+        })
+        
+        # Reduce stock
+        product.stock -= item['quantity']
+    
+    # Create order
+    order = Order(
+        customer_name=customer_name,
+        customer_email=customer_email,
+        shipping_address=shipping_address,
+        total_amount=total_amount,
+        status="Pending",
+        payment_method=payment_method,
+        payment_reference=f"MOCKPAY-{random.randint(1000000000, 9999999999)}"
+    )
+    db.add(order)
+    db.flush()  # Get order.id
+    
+    # Create order items
+    for item_data in order_items_data:
+        order_item = OrderItem(
+            order_id=order.id,
+            product_id=item_data['product'].id,
+            quantity=item_data['quantity'],
+            unit_price=item_data['unit_price']
+        )
+        db.add(order_item)
+    
+    db.commit()
+    db.refresh(order)
+    
+    return {
+        "message": "Order created successfully",
+        "order_id": order.id,
+        "total_amount": float(total_amount),
+        "payment_reference": order.payment_reference
+    }

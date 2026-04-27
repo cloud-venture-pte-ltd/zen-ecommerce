@@ -73,13 +73,16 @@ export default function ProductPage() {
   if (loading) return <div className="text-center">Loading...</div>
   if (!product) return <div className="alert alert-danger">Product not found</div>
 
+  // Local fallback image (gray placeholder with "No Image" text)
+  const fallbackImage = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='800' height='600' fill='%23e9ecef'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='32' fill='%236c757d' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E`
+
   return (
     <>
       <Alert type="danger" message={error} />
       <div className="row g-4">
         <div className="col-md-6">
           <img
-            src={product.image_url || 'https://via.placeholder.com/800x600?text=No+Image'}
+            src={product.image_url || fallbackImage}
             className="img-fluid rounded shadow-sm"
             alt={product.name}
           />

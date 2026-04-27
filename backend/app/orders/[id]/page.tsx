@@ -41,7 +41,7 @@ export default function OrderDetailPage() {
 
     const loadOrder = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/${orderId}`, {
+        const response = await fetch(`/api/orders/${orderId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
           },

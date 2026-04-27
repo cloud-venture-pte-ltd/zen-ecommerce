@@ -49,13 +49,13 @@ export default function AdminPage() {
 
   const loadData = async () => {
     try {
-      const productsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`, {
+      const productsResponse = await fetch('/api/admin/products', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
         },
       })
 
-      const ordersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders`, {
+      const ordersResponse = await fetch('/api/admin/orders', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
         },
@@ -84,7 +84,7 @@ export default function AdminPage() {
 
     try {
       const formData = new FormData(e.currentTarget)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products`, {
+      const response = await fetch('/api/admin/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
@@ -94,7 +94,10 @@ export default function AdminPage() {
 
       if (response.ok) {
         setSuccess('Product added successfully')
-        e.currentTarget.reset()
+        const form = e.currentTarget
+        if (form && form.reset) {
+          form.reset()
+        }
         loadData()
       } else {
         const data = await response.json()
@@ -115,7 +118,7 @@ export default function AdminPage() {
 
     try {
       const formData = new FormData(e.currentTarget)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${editingProduct.id}/update`, {
+      const response = await fetch(`/api/admin/products/${editingProduct.id}/update`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
@@ -145,7 +148,7 @@ export default function AdminPage() {
     setSuccess('')
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/products/${productId}/delete`, {
+      const response = await fetch(`/api/admin/products/${productId}/delete`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
@@ -178,7 +181,7 @@ export default function AdminPage() {
       const formData = new FormData()
       formData.append('status', status)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/${orderId}/status`, {
+      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,

@@ -24,7 +24,7 @@ export default function RegisterPage() {
 
     try {
       const formData = new FormData(e.currentTarget)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
+      const response = await fetch('/api/register', {
         method: 'POST',
         body: formData,
       })

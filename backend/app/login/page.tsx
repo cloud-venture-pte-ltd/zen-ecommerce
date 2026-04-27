@@ -24,7 +24,7 @@ export default function LoginPage() {
 
     try {
       const formData = new FormData(e.currentTarget)
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/login`
+      const apiUrl = '/api/login'
       console.log('Attempting login to:', apiUrl)
       
       const response = await fetch(apiUrl, {
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
   const handleSeedAdmin = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-admin`, {
+      const response = await fetch('/api/admin/seed-admin', {
         method: 'POST',
       })
       if (response.ok) {

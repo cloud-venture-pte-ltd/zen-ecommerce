@@ -55,45 +55,45 @@ export interface Order {
 // Auth API
 export const authAPI = {
   register: (name: string, email: string, password: string) =>
-    api.post<AuthResponse>('/api/register', { name, email, password }),
+    api.post<AuthResponse>('/register', { name, email, password }),
 
   login: (email: string, password: string) =>
-    api.post<AuthResponse>('/api/login', { email, password }),
+    api.post<AuthResponse>('/login', { email, password }),
 
-  logout: () => api.post('/api/logout'),
+  logout: () => api.post('/logout'),
 }
 
 // Products API
 export const productsAPI = {
   list: (q?: string) =>
-    api.get<Product[]>('/api/products', { params: { q } }),
+    api.get<Product[]>('/products', { params: { q } }),
 
   getById: (id: number) =>
-    api.get<Product>(`/api/products/${id}`),
+    api.get<Product>(`/products/${id}`),
 }
 
 // Cart API
 export const cartAPI = {
   add: (productId: number, quantity: number) =>
-    api.post(`/api/cart/add/${productId}`, { quantity }),
+    api.post(`/cart/add/${productId}`, { quantity }),
 
   get: () =>
-    api.get<CartItem[]>('/api/cart'),
+    api.get<CartItem[]>('/cart'),
 
   update: (productId: number, quantity: number) =>
-    api.post(`/api/cart/update/${productId}`, { quantity }),
+    api.post(`/cart/update/${productId}`, { quantity }),
 
   remove: (productId: number) =>
-    api.post(`/api/cart/remove/${productId}`),
+    api.post(`/cart/remove/${productId}`),
 }
 
 // Orders API
 export const ordersAPI = {
   list: () =>
-    api.get<Order[]>('/api/orders'),
+    api.get<Order[]>('/orders'),
 
   getById: (id: number) =>
-    api.get<Order>(`/api/orders/${id}`),
+    api.get<Order>(`/orders/${id}`),
 
   checkout: (
     customerName: string,
@@ -104,7 +104,7 @@ export const ordersAPI = {
     expiry: string,
     cvv: string
   ) =>
-    api.post('/api/checkout', {
+    api.post('/checkout', {
       customer_name: customerName,
       customer_email: customerEmail,
       shipping_address: shippingAddress,
@@ -118,16 +118,16 @@ export const ordersAPI = {
 // Admin API
 export const adminAPI = {
   getProducts: () =>
-    api.get<Product[]>('/api/admin/products'),
+    api.get<Product[]>('/admin/products'),
 
   addProduct: (formData: FormData) =>
-    api.post('/api/admin/products', formData, {
+    api.post('/admin/products', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
 
   getOrders: () =>
-    api.get<Order[]>('/api/admin/orders'),
+    api.get<Order[]>('/admin/orders'),
 
   updateOrderStatus: (orderId: number, status: string) =>
-    api.post(`/api/admin/orders/${orderId}/status`, { status }),
+    api.post(`/admin/orders/${orderId}/status`, { status }),
 }

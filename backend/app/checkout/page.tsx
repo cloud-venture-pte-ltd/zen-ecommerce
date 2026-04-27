@@ -56,7 +56,7 @@ export default function CheckoutPage() {
       // Add cart items to form data
       formData.append('cart_items_json', JSON.stringify(cartItems))
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/checkout`, {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
@@ -123,6 +123,7 @@ export default function CheckoutPage() {
                   ></textarea>
                 </div>
                 <h5 className="mb-3">Payment (Mock Gateway)</h5>
+                <input type="hidden" name="payment_method" value="Card" />
                 <div className="mb-3">
                   <label className="form-label">Cardholder Name</label>
                   <input

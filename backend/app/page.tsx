@@ -17,7 +17,7 @@ function HomePageContent() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        console.log('Loading products from:', process.env.NEXT_PUBLIC_API_URL)
+        console.log('Loading products from API')
         const res = await productsAPI.list(q)
         console.log('Products loaded:', res.data)
         setProducts(res.data)

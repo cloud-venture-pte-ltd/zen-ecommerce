@@ -1,4 +1,5 @@
 import time
+import json 
 from decimal import Decimal
 from pathlib import Path
 from typing import Optional, List
@@ -20,8 +21,20 @@ app = FastAPI(
     description="Zen E-Commerce built with FastAPI and PostgreSQL",
 )
 
-app.add_middleware(SessionMiddleware, secret_key=settings.session_secret, max_age=60 * 60 * 24)
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8000",
+        "http://backend:8000",
+        "https://zen-frontend-dev.nicemushroom-f0157107.southeastasia.azurecontainerapps.io",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def seed_admin_if_missing(db: Session) -> None:
     existing = db.query(User).filter(User.email == settings.admin_email).first()

@@ -1,17 +1,13 @@
 import time
-import json
-from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Optional, List
 from sqlalchemy.orm import joinedload
 from fastapi import FastAPI, Request, Depends, Form, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import or_, text
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
-
 from app.auth import hash_password, verify_password
 from app.core.config import settings
 from app.db import Base, SessionLocal, engine, get_db
@@ -453,7 +449,7 @@ def api_checkout(
     cart_items_json: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    user = require_api_auth(request, db)
+    require_api_auth(request, db)
     
     # Parse cart items from JSON
     try:

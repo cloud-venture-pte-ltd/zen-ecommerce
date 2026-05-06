@@ -17,4 +17,5 @@ jobs:
         run: |
           cd src/frontend
           npm install
-          npx eslint@8 pages/ --no-eslintrc --env es2020 --env browser --parser-options=ecmaVersion:2020,sourceType:module,ecmaFeatures:{jsx:true}
+          npm install --save-dev @typescript-eslint/parser
+          npx eslint@8 app/ --ext .ts,.tsx --no-eslintrc --parser @typescript-eslint/parser --env es2020 --env browser --parser-options=ecmaVersion:2020,sourceType:module

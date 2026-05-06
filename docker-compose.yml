@@ -7,52 +7,46 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - DB_HOST=${DB_HOST:-db}
-      - DB_PORT=${DB_PORT:-5432}
-      - DB_NAME=${DB_NAME:-ecommerce_db}
-      - DB_USER=${DB_USER:-ecom_user}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - SESSION_SECRET=${SESSION_SECRET}
-      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-change-me}
-      - APP_NAME=Zen E-Commerce
     depends_on:
-      - postgres
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/zen_db
+      - SESSION_SECRET=local-dev-secret-change-in-prod
+      - ADMIN_EMAIL=admin@zen.com
+      - ADMIN_PASSWORD=admin123
+      - APP_NAME=Zen E-Commerce
+      - BASE_PATH=
     networks:
       - ecommerce
 
   frontend:
     build:
-      context: ./backend
+      context: ./src/frontend
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_API_URL=
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=
     depends_on:
       - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
     networks:
       - ecommerce
 
-  postgres:
-    image: postgres:16-alpine
+  db:
+    image: postgres:15
     environment:
-      POSTGRES_DB: ${DB_NAME:-ecommerce_db}
-      POSTGRES_USER: ${DB_USER:-ecom_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: zen_db
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     networks:
       - ecommerce
 
 volumes:
-  postgres_data:
+  pgdata:
 
 networks:
   ecommerce:

@@ -35,6 +35,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SessionMiddleware, secret_key=settings.session_secret, max_age=60 * 60 * 24)
+
 
 def seed_admin_if_missing(db: Session) -> None:
     existing = db.query(User).filter(User.email == settings.admin_email).first()

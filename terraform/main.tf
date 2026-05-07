@@ -7,7 +7,7 @@ module "postgresql" {
     db_admin_password   = var.db_admin_password
 }
 
-module "keyvault" {
+mo21dule "keyvault" {
     source              = "./modules/keyvault"
     environment         = var.environment
     location            = var.location

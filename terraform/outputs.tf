@@ -13,3 +13,5 @@ output "blob_endpoint" {
 output "key_vault_uri" {
     value = module.keyvault.key_vault_uri
 }
+
+18724145632

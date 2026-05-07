@@ -22,7 +22,6 @@ Container Apps via GitHub Actions and Terraform.
 
 ```bash
 git clone https://github.com/cloud-venture-pte-ltd/zen-ecommerce.gitcd zen-ecommerce 
-echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > src/frontend/.env.local
 cp .env.example .env
 echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > src/frontend/.env.local
 docker compose up --build

@@ -581,6 +581,61 @@ def api_admin_add_product(
     db.refresh(product)
     return product
 
+@app.post("/api/admin/products/{product_id}/update", response_model=ProductResponse)
+def api_admin_update_product(
+    product_id: int,
+    request: Request,
+    name: str = Form(...),
+    description: str = Form(...),
+    category: str = Form(...),
+    price: Decimal = Form(...),
+    stock: int = Form(...),
+    image_url: str = Form(""),
+    image_file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db)
+):
+    require_api_admin(request, db)
+    product = db.get(Product, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    product.name = name
+    product.description = description
+    product.category = category
+    product.price = price
+    product.stock = stock
+
+    # Handle image: uploaded file takes precedence over URL
+    if image_file and image_file.filename:
+        if not (image_file.content_type or "").startswith("image/"):
+            raise HTTPException(status_code=400, detail="Only image uploads allowed")
+        product.image_url = save_upload(image_file)
+    elif image_url.strip():
+        product.image_url = image_url.strip()
+    else:
+        product.image_url = None
+
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+@app.post("/api/admin/products/{product_id}/delete")
+def api_admin_delete_product(
+    product_id: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    require_api_admin(request, db)
+    product = db.get(Product, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    db.delete(product)
+    db.commit()
+    return {"message": "Product deleted", "product_id": product_id}
+
+
 @app.post("/api/admin/orders/{order_id}/status")
 def api_admin_update_order_status(
     order_id: int,
@@ -592,7 +647,7 @@ def api_admin_update_order_status(
     order = db.get(Order, order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-    
+
     order.status = status
     db.commit()
     return {"message": "Order status updated", "order_id": order_id, "status": status}

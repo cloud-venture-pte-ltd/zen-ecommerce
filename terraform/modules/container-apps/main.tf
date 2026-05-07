@@ -41,6 +41,23 @@ resource "azurerm_container_app" "backend" {
             name  = "DATABASE_URL"
             value = var.database_url
         }
+
+        env {
+            name  = "ADMIN_EMAIL"
+            value = "admin@zen.com"
+        }
+        env {
+            name  = "ADMIN_PASSWORD"
+            value = "admin123"
+        }
+        env {
+            name  = "SESSION_SECRET"
+            value = "zen-session-secret-2026"
+        }
+        env {
+            name  = "APP_NAME"
+            value = "Zen E-Commerce"
+        }
         }
     }
 

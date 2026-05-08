@@ -22,6 +22,12 @@ module "blob_storage" {
     resource_group_name = var.resource_group_name
 }
 
+module "monitoring" {
+    source              = "./modules/monitoring"
+    environment         = var.environment
+    location            = var.location
+    resource_group_name = var.resource_group_name
+}
 module "container_apps" {
     source              = "./modules/container-apps"
     environment         = var.environment

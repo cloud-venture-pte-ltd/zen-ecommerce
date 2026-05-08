@@ -28,3 +28,5 @@ terraform/environments/*.tfvars
 terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.backup
+
+DEBUGGING.MD

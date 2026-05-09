@@ -11,6 +11,7 @@ resource "azurerm_container_app_environment" "main" {
     location                   = var.location
     resource_group_name        = var.resource_group_name
     log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+    
 }
 
 resource "azurerm_container_app" "backend" {
@@ -57,6 +58,10 @@ resource "azurerm_container_app" "backend" {
         env {
             name  = "APP_NAME"
             value = "Zen E-Commerce"
+        }
+        env {
+        name  = "APPLICATIONINSIGHTS_CONNECTION_STRING"
+        value = var.appinsights_connection_string
         }
         }
     }
@@ -116,3 +121,4 @@ resource "azurerm_container_app" "frontend" {
         }
     }
 }
+

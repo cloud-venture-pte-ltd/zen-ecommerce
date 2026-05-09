@@ -39,4 +39,5 @@ module "container_apps" {
     database_url        = module.postgresql.database_url
     acr_username        = var.acr_username
     acr_password        = var.acr_password
+    appinsights_connection_string = module.monitoring.connection_string
 }

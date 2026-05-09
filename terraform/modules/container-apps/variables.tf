@@ -35,3 +35,5 @@ variable "acr_password" {
     type      = string
     sensitive = true
 }
+
+variable "appinsights_connection_string" {}

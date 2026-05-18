@@ -37,6 +37,7 @@ resource "azurerm_container_app" "backend" {
             image  = var.backend_image
             cpu    = 0.5
             memory = "1Gi"
+    
 
         env {
             name  = "DATABASE_URL"
@@ -64,6 +65,10 @@ resource "azurerm_container_app" "backend" {
         value = var.appinsights_connection_string
         }
         }
+    
+    }
+    lifecycle { 
+        ignore_changes = [template]
     }
 
     ingress {

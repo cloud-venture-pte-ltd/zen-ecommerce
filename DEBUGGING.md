@@ -147,63 +147,12 @@ How to prevent: Ensure all form fields have corresponding API parameters
 
 ---
 
-## Bug #13 — Placeholder Images Failing to Load
-Date: 2026-04-27 | Owner: Local Testing Session
-What broke: Products without images showed broken image icons
-What we tried: Checked browser console, found via.placeholder.com connection errors
-Root cause: External placeholder service (via.placeholder.com) was unreachable
-Fix: Replaced external placeholder URLs with inline SVG data URIs in:
-  - backend/components/ProductCard.tsx
-  - backend/app/product/[id]/page.tsx
-How to prevent: Use local/static assets instead of external services for fallbacks
-Date: 2026-04-27
-
-### Working Configuration
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Database: PostgreSQL on localhost:5432
-
-### Default Credentials
-- Admin: admin@zenecommerce.com / admin123
-
-### Key Commands
-```powershell
-# Start all services
-docker compose up --build -d
-
-# Seed admin user
-Invoke-WebRequest -Uri http://localhost:8000/api/admin/seed-admin -Method POST
-
-# Test API
-Invoke-WebRequest -Uri http://localhost:8000/api/products | Select-Object -ExpandProperty Content
-```
-
-### All Issues Resolved
-✅ Docker Compose builds successfully
-✅ No CORS errors
-✅ All API endpoints working
-✅ User registration/login working
-✅ Product browsing and cart functionality
-✅ Checkout process complete
-✅ Admin dashboard functional
-✅ Order management working
-✅ Add/Edit/Delete products in admin
-
----
-
-## Bug #5 — ACR credentials missing from Container App Terraform config
-Date: 2026-04-25 | Owner: Spencer
-What broke: terraform apply failed with "must supply either identity or username/password_secret_name" for Container App registry
-What we tried: adding acr_password directly as attribute (wrong syntax)
-Root cause: Container Apps requires a secret block to store the ACR password, then reference it by name in the registry block
-Fix: add secret block before registry block in container app resource:
-     secret {
-       name  = "acr-password"
-       value = var.acr_password
-     }
-     registry {
-       server               = var.acr_login_server
-       username             = var.acr_username
-       password_secret_name = "acr-password"
-     }
-How to prevent: always check azurerm_container_app docs for registry authentication requirements before writing the resource
+## Bug #13 — Frontend 500 Error: Failed to Load Products
+Date: 2026-05-18 | Owner: Spencer (DevOps)
+What broke: Frontend showing "Failed to load products: Request failed with status code 500"
+Root cause: Terraform renamed BACKEND_URL to NEXT_PUBLIC_API_URL. NEXT_PUBLIC_API_URL
+            is baked into the Docker image at build time — not available at runtime
+            on Azure Container Apps. BACKEND_URL is the correct variable.
+Fix: Reverted env var back to BACKEND_URL in container-apps/main.tf
+     Ran terraform apply to update the frontend container
+How to prevent: Never rename BACKEND_URL to NEXT_PUBLIC_API_URL in Terraform

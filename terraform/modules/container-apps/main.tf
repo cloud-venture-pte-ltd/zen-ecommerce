@@ -99,7 +99,6 @@ resource "azurerm_container_app" "frontend" {
         image  = var.frontend_image
         cpu    = 0.5
         memory = "1Gi"
-
         env {
             name  = "BACKEND_URL"
             value = "https://${azurerm_container_app.backend.ingress[0].fqdn}"

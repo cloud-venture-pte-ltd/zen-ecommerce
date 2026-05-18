@@ -99,15 +99,9 @@ resource "azurerm_container_app" "frontend" {
         image  = var.frontend_image
         cpu    = 0.5
         memory = "1Gi"
-
-        env {
-            name  = "NEXT_PUBLIC_API_URL"
-            value = "https://zen-backend-dev.nicemushroom-f0157107.southeastasia.azurecontainerapps.io"
-            }
-
         env {
             name  = "BACKEND_URL"
-            value = "https://zen-backend-dev.nicemushroom-f0157107.southeastasia.azurecontainerapps.io"
+            value = "https://${azurerm_container_app.backend.ingress[0].fqdn}"
             }
         }
     }

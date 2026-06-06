@@ -38,7 +38,7 @@ curl http://localhost:3000/api/health  # {"status":"ok"}
 
 | Environment | Backend | Frontend |
 |-------------|---------|----------|
-| dev | https://zen-backend-dev.nicemushroom-f0157107.southeastasia.azurecontainerapps.io | https://zen-frontend-dev.nicemushroom-f0157107.southeastasia.azurecontainerapps.io |
+| dev | https://zen-frontend-dev.orangefield-15619624.southeastasia.azurecontainerapps.io | https://zen-frontend-dev.orangefield-15619624.southeastasia.azurecontainerapps.io |
 
 ## Deploy
 

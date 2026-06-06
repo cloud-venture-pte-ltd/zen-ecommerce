@@ -29,7 +29,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://127.0.0.1:8000",
         "http://backend:8000",
-        "https://zen-frontend-dev.nicemushroom-f0157107.southeastasia.azurecontainerapps.io",
+        "https://zen-frontend-dev.orangefield-15619624.southeastasia.azurecontainerapps.io",
     ],
     allow_credentials=True,
     allow_methods=["*"],

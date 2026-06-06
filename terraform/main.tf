@@ -40,4 +40,6 @@ module "container_apps" {
     acr_username        = var.acr_username
     acr_password        = var.acr_password
     appinsights_connection_string = module.monitoring.connection_string
+    log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
 }
+

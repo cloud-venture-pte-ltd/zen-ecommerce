@@ -37,3 +37,4 @@ variable "acr_password" {
 }
 
 variable "appinsights_connection_string" {}
+variable "log_analytics_workspace_id" {}

@@ -156,3 +156,40 @@ Root cause: Terraform renamed BACKEND_URL to NEXT_PUBLIC_API_URL. NEXT_PUBLIC_AP
 Fix: Reverted env var back to BACKEND_URL in container-apps/main.tf
      Ran terraform apply to update the frontend container
 How to prevent: Never rename BACKEND_URL to NEXT_PUBLIC_API_URL in Terraform
+
+## Bug #14 — Infrastructure Deleted by Teammate
+Date: 2026-06-07 | Owner: Spencer (DevOps)
+What broke: All Azure resources deleted — Container Apps, PostgreSQL, 
+            Key Vault, ACR, Blob Storage, Terraform state
+Root cause: Teammate deleted resource groups without checking contents
+Fix: Full infrastructure rebuild via Terraform
+     New Container Apps environment: orangefield-15619624
+     Delete lock added to zen-tfstate-rg to prevent repeat
+How to prevent: Add CanNotDelete lock to all critical resource groups
+                Never delete RGs without team confirmation on Teams
+
+## Bug #15 — Backend Dockerfile Overwritten with Frontend Content
+Date: 2026-06-07 | Owner: Spencer (DevOps)
+What broke: docker compose up failed — backend trying to run npm install
+Root cause: src/backend/Dockerfile accidentally replaced with 
+            src/frontend/Dockerfile content during Dockerfile changes
+Fix: Restored correct Python/FastAPI Dockerfile for backend
+How to prevent: Always check both Dockerfiles after any Dockerfile changes
+                Test with docker compose up --build locally before pushing
+
+## Bug #16 — Frontend 500 Error After Infrastructure Rebuild
+Date: 2026-06-07 | Owner: Spencer (DevOps)
+What broke: Frontend showing 500 error — products not loading on Azure
+Root cause: Next.js rewrites in next.config.js are evaluated at BUILD TIME
+            not runtime. BACKEND_URL env var on Container Apps is ignored
+            by the rewrite. Must be passed as Docker build arg.
+            Additionally, "Set environment name" step in deploy.yml was
+            positioned AFTER build steps, so BACKEND_URL build arg 
+            resolved to empty string during the build.
+Fix: Added ARG BACKEND_URL to Dockerfile before RUN npm run build
+     Passed --build-arg BACKEND_URL in deploy.yml docker build command
+     Moved "Set environment name" step before build steps in deploy.yml
+     Changed lib/api.ts to use BACKEND_URL instead of NEXT_PUBLIC_API_URL
+How to prevent: Next.js config values are build-time only
+                Always pass backend URL as build arg, never runtime env
+                Set environment variables before any step that uses them

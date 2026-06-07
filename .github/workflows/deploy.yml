@@ -39,6 +39,7 @@ jobs:
       - name: Build and push frontend image
         run: |
           docker build \
+            --no-cache \
             --build-arg BACKEND_URL=https://zen-backend-${{ env.ENVIRONMENT }}.orangefield-15619624.southeastasia.azurecontainerapps.io \
             -t ${{ env.ACR_LOGIN_SERVER }}/frontend:${{ env.IMAGE_TAG }} \
             ./src/frontend

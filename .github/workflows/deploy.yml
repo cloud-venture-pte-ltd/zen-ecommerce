@@ -63,7 +63,9 @@ jobs:
           az containerapp update \
             --name zen-frontend-${{ env.ENVIRONMENT }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
-            --image ${{ env.ACR_LOGIN_SERVER }}/frontend:${{ env.IMAGE_TAG }}
+            --image ${{ env.ACR_LOGIN_SERVER }}/frontend:${{ env.IMAGE_TAG }} \
+            --set-env-vars \
+            "BACKEND_URL=https://zen-backend-${{ env.ENVIRONMENT }}.orangefield-15619624.southeastasia.azurecontainerapps.io"
 
       - name: Verify backend health
         run: |

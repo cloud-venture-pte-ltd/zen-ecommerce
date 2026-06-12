@@ -72,7 +72,7 @@ function HomePageContent() {
     <>
       <Alert type="danger" message={error} />
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h1 className="h3 mb-0">Products</h1>
+        <h1 className="h3 mb-0">test Products</h1>
         {q && <span className="text-muted">Search: "{q}"</span>}
       </div>
       <div className="row g-4">
